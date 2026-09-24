@@ -1,4 +1,5 @@
 # 1. Tipos de datos
+```bash
 tipo ::= "grano"           (* int *)
        | "poso"            (* float *)
        | "granoMolido"     (* string *)
@@ -8,20 +9,25 @@ tipo ::= "grano"           (* int *)
        | "ralo"            (* false *)
        | "descafeinado"    (* null *)
        | "SeQuemoElCafe"   (* error *)
+```
 
 # 2. Estructura del Programa
+```bash
 programa               ::= { declaracion_global | declaracion_funcion } declaracion_chorreador
 declaracion_global     ::= "cafeteria" tipo identificador [ "=" expresion ] ";"
 declaracion_chorreador ::= "chorreador" "(" ")" bloque
+```
 
 # 3. Funciones
+```bash
 declaracion_funcion    ::= "barista" identificador "(" [ parametros ] ")" bloque
 parametros             ::= parametro { "," parametro }
 parametro              ::= tipo identificador
 llamada_funcion        ::= identificador "(" [ argumentos ] ")"
 argumentos             ::= expresion { "," expresion }
-
+```
 # 4. Bloques y Sentencias
+```bash
 bloque                 ::= "{" { sentencia } "}"
 
 sentencia              ::= declaracion_var_local
@@ -38,19 +44,25 @@ declaracion_var_local  ::= tipo identificador [ "=" expresion ] ";"
 asignacion             ::= identificador "=" expresion ";"
 llamada_servir         ::= "servir" "(" expresion ")" ";"
 retorno_degustar       ::= "degustar" ( expresion | "descafeinado" | "SeQuemoElCafe" ) ";"
+```
 
 # 5. Estructuras de control
+```bash
 estructura_condicional ::= "hierve" "(" expresion ")" bloque [ "enfria" bloque ]
 bucle_chorreando       ::= "chorreando" "(" expresion ")" bloque
 bucle_recolar          ::= "recolar" "(" tipo identificador "en" identificador ")" bloque
+```
 
 # 6. Operadores lógicos
+```bash
 op_or                  ::= "SinAzucar"
 op_and                 ::= "ConAzucar"
 op_not                 ::= "Amargo"
 op_relacional          ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+```
 
 # 7. Jerarquía de Expresiones (Precedencia)
+```bash
 expresion              ::= expresion_or
 expresion_or           ::= expresion_and { op_or expresion_and }
 expresion_and          ::= expresion_not { op_and expresion_not }
@@ -68,8 +80,10 @@ factor                 ::= literal
 operacion_lista        ::= identificador "." ( "insertar(" expresion ")" 
                                              | "extraer(" expresion ")" 
                                              | "buscar(" expresion ")" )
+```
 
 # 8. Literales y Terminales
+```bash
 literal                ::= numero_entero
                          | numero_decimal
                          | cadena
@@ -90,3 +104,5 @@ letra                  ::= "A".."Z" | "a".."z"
 digito                 ::= "0".."9"
 caracter_cadena        ::= ? cualquier caracter excepto comillas dobles y salto de linea ?
 comentario             ::= "#" { ? cualquier caracter excepto salto de linea ? }
+
+```
