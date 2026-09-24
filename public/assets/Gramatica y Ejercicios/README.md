@@ -1,3 +1,4 @@
+# Gramatica EBNF
 # 1. Tipos de datos
 ```bash
 tipo ::= "grano"           (* int *)
