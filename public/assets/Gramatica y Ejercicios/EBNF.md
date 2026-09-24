@@ -15,7 +15,7 @@ tipo ::= "grano"           (* int *)
 ```bash
 programa               ::= { declaracion_global | declaracion_funcion } declaracion_chorreador
 declaracion_global     ::= "cafeteria" tipo identificador [ "=" expresion ] ";"
-declaracion_chorreador ::= "chorreador" "(" ")" bloque
+declaracion_chorreador ::= "barista" "chorreador" "(" ")" bloque
 ```
 
 # 3. Funciones
@@ -43,7 +43,8 @@ sentencia              ::= declaracion_var_local
 declaracion_var_local  ::= tipo identificador [ "=" expresion ] ";"
 asignacion             ::= identificador "=" expresion ";"
 llamada_servir         ::= "servir" "(" expresion ")" ";"
-retorno_degustar       ::= "degustar" ( expresion | "descafeinado" | "SeQuemoElCafe" ) ";"
+llamada_leer           ::= identificador "=" "leer" "(" ")" ";"
+retorno_degustar       ::= "degustar" expresion ";"
 ```
 
 # 5. Estructuras de control
@@ -77,9 +78,9 @@ factor                 ::= literal
                          | operacion_lista
                          | "(" expresion ")"
 
-operacion_lista        ::= identificador "." ( "insertar(" expresion ")" 
-                                             | "extraer(" expresion ")" 
-                                             | "buscar(" expresion ")" )
+operacion_lista        ::= identificador "." ( "insertar" "(" expresion ")"
+                                             | "extraer" "(" expresion ")"
+                                             | "buscar" "(" expresion ")" )
 ```
 
 # 8. Literales y Terminales
