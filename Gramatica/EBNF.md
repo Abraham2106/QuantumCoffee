@@ -5,10 +5,6 @@ tipo ::= "grano"           (* int *)
        | "granoMolido"     (* string *)
        | "taza" tipo       (* array de un tipo *)
        | "cafe"            (* boolean *)
-       | "fuerte"          (* true *)
-       | "ralo"            (* false *)
-       | "descafeinado"    (* null *)
-       | "SeQuemoElCafe"   (* error *)
 ```
 
 # 2. Estructura del Programa
@@ -26,18 +22,23 @@ parametro              ::= tipo identificador
 llamada_funcion        ::= identificador "(" [ argumentos ] ")"
 argumentos             ::= expresion { "," expresion }
 ```
+
 # 4. Bloques y Sentencias
 ```bash
 bloque                 ::= "{" { sentencia } "}"
 
 sentencia              ::= declaracion_var_local
+                         | declaracion_qubit
                          | asignacion
                          | estructura_condicional
                          | bucle_chorreando
                          | bucle_recolar
+                         | llamada_leer
                          | llamada_servir
                          | llamada_funcion ";"
                          | operacion_lista ";"
+                         | operacion_cuantica ";"
+                         | medicion_cuantica ";"
                          | retorno_degustar
 
 declaracion_var_local  ::= tipo identificador [ "=" expresion ] ";"
@@ -76,6 +77,7 @@ factor                 ::= literal
                          | identificador
                          | llamada_funcion
                          | operacion_lista
+                         | medicion_cuantica
                          | "(" expresion ")"
 
 operacion_lista        ::= identificador "." ( "insertar" "(" expresion ")"
@@ -105,5 +107,18 @@ letra                  ::= "A".."Z" | "a".."z"
 digito                 ::= "0".."9"
 caracter_cadena        ::= ? cualquier caracter excepto comillas dobles y salto de linea ?
 comentario             ::= "#" { ? cualquier caracter excepto salto de linea ? }
+```
 
+# 9. Extensión cuántica
+```bash
+declaracion_qubit      ::= "qubit" identificador ";"
+
+operacion_cuantica     ::= compuerta_unaria
+                         | compuerta_binaria
+
+compuerta_unaria       ::= ( "H" | "X" | "Z" ) "(" identificador ")"
+
+compuerta_binaria      ::= "CNOT" "(" identificador "," identificador ")"
+
+medicion_cuantica      ::= "medir" "(" identificador ")"
 ```
