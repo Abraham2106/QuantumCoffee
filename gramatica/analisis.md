@@ -2,54 +2,58 @@
 
 ### 3.1 Elementos sólidos
 
-**Una jerarquía de expresiones explícita y sin recursión izquierda:** La precedencia se codifica en la estructura de la gramática: `expresion_or` → `expresion_and` → `expresion_not` → `expresion_relacional` → `expresion_aritmetica` → `termino` → `factor`. Cada nivel usa repeticiones `{ ... }` en lugar de recursión izquierda, así que cada producción se convierte casi directamente en una función de un analizador descendente recursivo. La precedencia no depende de tablas externas. Por ejemplo, `2 + 3 * 4` se agrupa como `2 + (3 * 4)` porque `*` vive en término, un nivel más profundo que `+`.
+Jerarquía de expresiones: La prioridad de los operadores se define directamente en la gramática siguiendo este orden:
 
-**Los bloques con llaves obligatorias eliminan el "else colgante":** En C, `if (a) if (b) x(); else y();` obliga al programador a saber a cuál `if` pertenece el `else`. En Quantum Coffee `hierve` y `enfria` exigen `bloque`, por lo que la intención siempre queda escrita:
+`expresion_or > expresion_and > expresion_not > expresion_relacional > expresion_aritmetica > termino > factor`
 
-```
+En cada nivel se usan repeticiones `{ ... }` en vez de recursión izquierda. Esto facilita convertir cada producción en una función dentro de un analizador descendente recursivo. Además, no hace falta utilizar una tabla externa para definir la prioridad de los operadores. Por ejemplo, en `2 + 3 * 4`, primero se resuelve `3 * 4` y después se suma 2, porque `*` se encuentra en un nivel más profundo que `+`.
+
+Los bloques con llaves evitan el problema del "else colgante": En lenguajes como C puede existir confusión sobre a cuál `if` pertenece un `else` cuando hay varias condiciones seguidas. En Quantum Coffee, `hierve` y `enfria` siempre utilizan bloques con llaves, por lo que es más fácil ver qué instrucciones pertenecen a cada condición.
+
+```text
 hierve (a) {
-    hierve (b) { servir("a y b") ; }
+    hierve (b) { servir("a y b"); }
 } enfria {
-    servir("no a") ;
+    servir("no a");
 }
 ```
 
-**La asignación es una sentencia, no una expresión:** `=` solo aparece en `asignacion` y en las declaraciones; dentro de una condición solo existe `==`. Por eso el clásico error de C queda fuera del lenguaje:
+La asignación como una sentencia: El símbolo `=` solamente se utiliza al declarar una variable o al hacer una asignación. Dentro de una condición se utiliza `==`. Esto evita errores comunes como escribir una asignación dentro de una condición por accidente.
 
+```text
+hierve (temperatura = 90) { ... }   # rechazado: "=" no pertenece a expresion
 ```
-hierve (temperatura = 90) { ... }   # rechazado: "=" no forma parte de expresion
-```
 
-**Ámbito visible desde la declaración:** Las variables globales llevan la palabra `cafeteria`, y las locales no llevan prefijo. Quien lee el código distingue el alcance de una variable sin buscar dónde se declaró, y no se crean globales por accidente. Además, `chorreador` se declara con `barista` igual que cualquier función, así que hay una sola sintaxis para todo subprograma.
+El alcance de las variables: Las variables globales utilizan la palabra `cafeteria`, mientras que las variables locales no necesitan un prefijo. Gracias a esto, al leer el código se puede reconocer con mayor facilidad si una variable es global o local. También ayuda a evitar que se creen variables globales por accidente. Además, `chorreador` se declara utilizando `barista`, igual que las demás funciones, manteniendo una forma similar para declarar los subprogramas.
 
-**Tipos suficientes y listas tipadas:** El lenguaje trae cadenas, booleanos, nulo y error como valores nativos. `taza tipo` es recursivo, así que `taza taza grano` permite matrices. Como las listas son homogéneas y los parámetros llevan tipo (`taza grano inventario`), la firma de una función ya documenta lo que espera recibir.
+Tipos básicos y listas con un tipo definido: El lenguaje incluye cadenas, booleanos, nulo y error como valores propios. También permite usar `taza` varias veces, por ejemplo `taza taza grano`, lo que permite representar estructuras como matrices. Como las listas mantienen un mismo tipo de datos y los parámetros indican el tipo que reciben, una declaración como `taza grano inventario` permite entender mejor qué clase de información espera una función.
 
-**Identidad temática coherente:** La metáfora se aplica de forma sistemática: `barista` (quien prepara) es la función, `degustar` es el retorno, `servir` es la salida, `chorreando` y `recolar` son los ciclos, y `hierve`/`enfria` es la bifurcación. Esto reduce la carga de aprendizaje, porque una vez entendida la metáfora la mayoría de las palabras reservadas se deducen (ver 3.3).
+Temática: Las palabras reservadas siguen la temática de una cafetería. Por ejemplo, `barista` se utiliza para las funciones, `degustar` para retornar un valor, `servir` para mostrar una salida, `chorreando` y `recolar` para los ciclos, y `hierve` junto con `enfria` para las condiciones. Al mantener esta misma idea a lo largo del lenguaje, es más sencillo relacionar cada palabra con lo que hace una vez que se entiende la temática general.
 
 ### 3.2 Elementos débiles
 
-**Las funciones no declaran tipo de retorno:** En el Ejercicio 5, `auditarInventario` devuelve un `cafe`, pero nada en su firma lo dice:
+Las funciones no dicen directamente qué tipo de dato devuelven: En el Ejercicio 5, por ejemplo, `auditarInventario` devuelve un `cafe`, pero eso no aparece en la firma:
 
-```
+```text
 barista auditarInventario(taza grano inventario) { ... degustar fuerte ; }
 ```
 
-Quien la llama solo puede saber qué devuelve leyendo el cuerpo, y el analizador semántico debe inferirlo a partir de los `degustar`. Tampoco hay forma de marcar una función que no devuelve nada.
+Entonces, para saber qué devuelve la función, toca revisar el cuerpo y ver qué aparece en los `degustar`. Esto también hace que el analizador semántico tenga que averiguarlo por su cuenta. Además, tampoco existe una forma de indicar claramente que una función no devuelve nada.
 
-**Las listas no se pueden indexar ni medir:** Las únicas operaciones son `insertar`, `extraer` y `buscar`:
+Las listas se quedan un poco cortas en operaciones: Por ahora solo permiten `insertar`, `extraer` y `buscar`. No se puede entrar directamente a una posición ni preguntar cuántos elementos tiene la lista. Por ejemplo:
 
+```text
+granoMolido primero = menu[0] ; # no existe: no se puede acceder por posición
+grano n = menu.largo() ;        # no existe: no hay una operación para obtener el tamaño
 ```
-granoMolido primero = menu[0] ;   # no existe: factor no admite indexacion
-grano n = menu.largo() ;          # no existe: no hay operacion de longitud
-```
 
-Leer un elemento sin sacarlo de la lista solo es posible dentro de `recolar`, y no hay forma de modificar una posición. Además, `buscar` devuelve un booleano, así que no dice dónde está el elemento.
+Si se quiere ver un elemento sin sacarlo de la lista, básicamente hay que hacerlo dentro de `recolar`. Tampoco se puede cambiar directamente lo que está guardado en una posición. Y `buscar` solamente responde si el elemento está o no, pero no dice en qué posición aparece.
 
-**Los números son limitados:** `numero_entero` es solo `digito { digito }` y `factor` no admite un `-` unario, por lo que `grano deuda = -5 ;` no es válido y hay que escribir `0 - 5`. Tampoco existen `.5` ni notación científica.
+Los números también tienen algunas limitaciones: `numero_entero` está formado solo por dígitos y `factor` no acepta un `-` directamente delante de un número. Entonces algo como `grano deuda = -5 ;` no funciona y habría que escribir `0 - 5`. Tampoco se pueden escribir valores como `.5` ni usar notación científica, así que por ese lado el formato de números es bastante básico.
 
-**El control de flujo es mínimo:** No hay `else if`, así que una cadena de casos debe anidarse dentro de `enfria`:
+El control de flujo es bastante sencillo: No existe algo como `else if`, así que cuando hay varias condiciones toca ir metiendo un `hierve` dentro del `enfria` anterior:
 
-```
+```text
 hierve (temperatura < 50) {
     servir("Frio") ;
 } enfria {
@@ -61,16 +65,9 @@ hierve (temperatura < 50) {
 }
 ```
 
-Tampoco hay `for` con contador, `break` ni `continue`. Repetir N veces exige una variable auxiliar y `chorreando`, como en el Ejercicio 3.
+También hacen falta algunas instrucciones comunes como `for` con contador, `break` y `continue`. Si se quiere repetir algo una cantidad específica de veces, hay que crear una variable auxiliar y resolverlo usando `chorreando`, como pasa en el Ejercicio 3. Funciona, pero claramente se vuelve un poco más largo de lo necesario.
 
-**Las cadenas y la salida son rígidas.** `caracter_cadena` excluye las comillas dobles y el salto de línea, y no hay secuencias de escape, así que `servir("Dijo \"hola\"") ;` no es válido. `servir` recibe una sola expresión, por lo que todo se arma con `+`, y no se especifica qué pasa al concatenar un `granoMolido` con un `poso`. Además, los identificadores admiten solo letras ASCII, lo que impide usar `ñ` o tildes en un lenguaje pensado en español.
-
-**El tipo de error no tiene mecanismo asociado:** `SeQuemoElCafe` existe como valor, pero nada en la gramática permite generarlo, capturarlo o tratarlo distinto de otro valor. No hay `try`/`catch` ni una comprobación equivalente.
-
-#### Inconsistencias en la gramática actual
-
-1. **Las palabras reservadas no están enumeradas.** La gramática dice que no pueden usarse como identificadores, pero no las lista, y varios terminales cumplen también la regla de `identificador`. `barista chorreador() { }` deriva de `declaracion_funcion` y de `declaracion_chorreador`, y `x = leer() ;` deriva de `llamada_leer` y de `asignacion`. Con la extensión cuántica pasa lo mismo: `H(a) ;` deriva de `llamada_funcion` y de `compuerta_unaria`, y `medir(a)` de `llamada_funcion` y de `medicion_cuantica`. Además, si `H`, `X` y `Z` son reservadas, dejan de estar disponibles como nombres de variables de una letra.
-2. **Varias alternativas comparten prefijo.** `declaracion_funcion` y `declaracion_chorreador` empiezan con `barista`, y en `sentencia` y `factor` varias alternativas empiezan con `identificador` (asignación, llamada, operación de lista, y en `sentencia` también `llamada_leer`). Un analizador LL(1) necesita factorizar por la izquierda o mirar más de un token para decidir entre ellas.
+Las cadenas y la salida: `caracter_cadena` no permite usar comillas dobles dentro del texto ni saltos de línea, y tampoco hay secuencias de escape. Entonces algo como `servir("Dijo "hola"") ;` no sería válido. Además, `servir` recibe una sola expresión, por lo que si se quieren mostrar varias cosas hay que unirlas usando `+`. Tampoco queda definido qué debería pasar al mezclar tipos distintos, por ejemplo un `granoMolido` con un `poso`. Otro detalle curioso es que los identificadores solo aceptan letras ASCII, así que no se podrían usar `ñ` ni tildes, lo cual se siente un poco raro para un lenguaje que está pensado en español.
 
 ### 3.3 Elementos chistosos
 
