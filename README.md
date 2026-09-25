@@ -13,3 +13,7 @@
 - Justin Lacayo
 - Abraham Solano
 - Dario Soto
+
+## Infografía
+
+<img src="public/assets/infografia.png" alt="Infografía de Quantum Coffee: identidad del lenguaje, tipos y estructuras, extensión cuántica, gramática y validación" width="100%">
