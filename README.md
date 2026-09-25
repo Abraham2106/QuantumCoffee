@@ -4,7 +4,9 @@
   <p>Proyecto del curso de Compiladores</p>
 </div>
 
-## Integrantes de Javan't - <img src="public/assets/javant-1.png" alt="Logo de Javan't" width="28">
+## Integrantes de Javan't
+
+<img src="public/assets/javant-1.png" alt="Logo de Javan't" width="240">
 
 - Andres Baldi
 - Tomas Blando
